@@ -9,3 +9,5 @@ PGDATABASE=nc_news
 
 .env.test
 PGDATABASE=nc_news_test
+
+test push
