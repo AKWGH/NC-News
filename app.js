@@ -2,17 +2,20 @@
 const express = require('express');
 //controllers
 const { sendTopics } = require('./controllers/topics-controller');
+const { sendArticles } = require('./controllers/articles-controller');
+const { invalidPathError } = require('./controllers/errors-controller');
 
 // initialises express server
 const app = express();
 
-// GET req
+// requests
 app.get('/api/topics', sendTopics);
 
-//errors
-app.use((err, req, res, next) => {
-  console.log(err);
-});
+app.get('/api/articles', sendArticles);
+
+// handles invalid path
+app.use(invalidPathError);
+
 // app listener listening for requests
 // app.listen(9090, () => {
 //   console.log('listening on 9090');

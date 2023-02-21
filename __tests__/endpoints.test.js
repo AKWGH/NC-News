@@ -1,4 +1,6 @@
 const request = require('supertest');
+require('jest-sorted');
+
 const app = require('../app');
 
 // seed function to seed the test database
@@ -22,6 +24,17 @@ afterAll(() => {
 });
 
 describe('app endpoint tests', () => {
+  describe('testing invalid paths handler', () => {
+    it('should respond with a status 404 and msg', () => {
+      return request(app)
+        .get('/api/invalid-path')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Sorry, path not found');
+        });
+    });
+  });
+
   describe('GET /api/topics', () => {
     it('should respond with a status 200 and array of objects containing all topics data', () => {
       return request(app)
@@ -29,13 +42,41 @@ describe('app endpoint tests', () => {
         .expect(200)
         .then(({ body }) => {
           const { topics } = body;
-          console.log(topics);
 
           expect(topics.length).toBe(3);
           // testing individual properties on objects
           topics.forEach((topic) => {
             expect(topic).toHaveProperty('slug', expect.any(String));
             expect(topic).toHaveProperty('description', expect.any(String));
+          });
+        });
+    });
+  });
+  describe('GET /api/articles', () => {
+    it('should respond with a status 200 and array of objects containing all articles data', () => {
+      return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+
+          expect(articles.length).toBe(12);
+
+          // testing individual properties on articles
+          articles.forEach((article) => {
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+            // testing that the articles array is sorted with jest-sorted
+            expect(articles).toBeSorted({ key: 'created_at' });
           });
         });
     });
