@@ -22,4 +22,18 @@ const selectArticles = () => {
     });
 };
 
-module.exports = { selectArticles };
+const selectIndividualArticle = (article_id) => {
+  // selects the individual article data
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then((data) => {
+      // rejects promise as no article data exists
+      if (data.rows.length === 0) {
+        return Promise.reject('Sorry, no article found');
+      }
+      // article data exists so it sends a response
+      return data.rows;
+    });
+};
+
+module.exports = { selectArticles, selectIndividualArticle };
