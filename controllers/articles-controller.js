@@ -1,7 +1,7 @@
 // models
 const {
   selectArticles,
-  SelectIndividualArticle,
+  selectIndividualArticle,
 } = require('../models/articles-model');
 
 // controller functions
@@ -14,7 +14,7 @@ const sendArticles = (req, res) => {
 const sendIndividualArticle = (req, res, next) => {
   const { article_id } = req.params;
 
-  SelectIndividualArticle(article_id)
+  selectIndividualArticle(article_id)
     .then((article) => {
       res.status(200).send({ article });
     })

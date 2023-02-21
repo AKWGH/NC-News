@@ -22,7 +22,7 @@ const selectArticles = () => {
     });
 };
 
-const SelectIndividualArticle = (article_id) => {
+const selectIndividualArticle = (article_id) => {
   // selects the individual article data
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
@@ -36,4 +36,4 @@ const SelectIndividualArticle = (article_id) => {
     });
 };
 
-module.exports = { selectArticles, SelectIndividualArticle };
+module.exports = { selectArticles, selectIndividualArticle };
