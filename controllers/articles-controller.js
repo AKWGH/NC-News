@@ -1,5 +1,8 @@
 // models
-const { selectArticles } = require('../models/articles-model');
+const {
+  selectArticles,
+  SelectIndividualArticle,
+} = require('../models/articles-model');
 
 // controller functions
 const sendArticles = (req, res) => {
@@ -8,4 +11,16 @@ const sendArticles = (req, res) => {
   });
 };
 
-module.exports = { sendArticles };
+const sendIndividualArticle = (req, res, next) => {
+  const { article_id } = req.params;
+
+  SelectIndividualArticle(article_id)
+    .then((article) => {
+      res.status(200).send({ article });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+module.exports = { sendArticles, sendIndividualArticle };
