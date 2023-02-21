@@ -1,4 +1,6 @@
 const request = require('supertest');
+require('jest-sorted');
+
 const app = require('../app');
 
 // seed function to seed the test database
@@ -57,22 +59,24 @@ describe('app endpoint tests', () => {
         .expect(200)
         .then(({ body }) => {
           const { articles } = body;
+
           expect(articles.length).toBe(12);
 
           // testing individual properties on articles
           articles.forEach((article) => {
-            expect(article).toHaveProperty('article_id', expect.any(Number));
-            expect(article).toHaveProperty('title', expect.any(String));
-            expect(article).toHaveProperty('topic', expect.any(String));
-            expect(article).toHaveProperty('author', expect.any(String));
-            expect(article).toHaveProperty('body', expect.any(String));
-            expect(article).toHaveProperty('created_at', expect.any(String));
-            expect(article).toHaveProperty('votes', expect.any(Number));
-            expect(article).toHaveProperty(
-              'article_img_url',
-              expect.any(String)
-            );
-            expect(article).toHaveProperty('comment_count', expect.any(Number));
+            expect(article).toMatchObject({
+              article_id: expect.any(Number),
+              title: expect.any(String),
+              topic: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: expect.any(String),
+              comment_count: expect.any(Number),
+            });
+            // testing that the articles array is sorted with jest-sorted
+            expect(articles).toBeSorted({ key: 'created_at' });
           });
         });
     });
