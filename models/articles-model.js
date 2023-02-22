@@ -54,7 +54,7 @@ const articleExists = (article_id) => {
     .then((data) => {
       // rejected Promise if data does not contain anything
       if (data.rows.length === 0) {
-        return Promise.reject('article does not exist');
+        return Promise.reject('Sorry, no article found');
       }
     });
 };
