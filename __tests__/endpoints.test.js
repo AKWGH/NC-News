@@ -161,5 +161,13 @@ describe('app endpoint tests', () => {
           expect(body).toEqual({ comments: [] });
         });
     });
+    it('should respond with a status 404 Sorry, no article found', () => {
+      return request(app)
+        .get('/api/articles/10000/comments')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Sorry, no article found');
+        });
+    });
   });
 });
