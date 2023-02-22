@@ -36,4 +36,32 @@ const selectIndividualArticle = (article_id) => {
     });
 };
 
-module.exports = { selectArticles, selectIndividualArticle };
+const selectArticleComments = (article_id) => {
+  // selects the comments data for specified article
+  return db
+    .query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at`, [
+      article_id,
+    ])
+    .then((data) => {
+      return data.rows;
+    });
+};
+
+// function to check if the article exists throws an error if not
+const articleExists = (article_id) => {
+  return db
+    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
+    .then((data) => {
+      // rejected Promise if data does not contain anything
+      if (data.rows.length === 0) {
+        return Promise.reject('Sorry, no article found');
+      }
+    });
+};
+
+module.exports = {
+  selectArticles,
+  selectIndividualArticle,
+  selectArticleComments,
+  articleExists,
+};

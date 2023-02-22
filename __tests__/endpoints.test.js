@@ -120,4 +120,54 @@ describe('app endpoint tests', () => {
         });
     });
   });
+  describe('GET /api/articles/:article_id/comments', () => {
+    it('should respond with a status 200 and respond with an array of all columns for the selected article', () => {
+      return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({ body }) => {
+          const { comments } = body;
+
+          // test to check the length of comments array is as expected
+          expect(comments.length).toBe(11);
+          // test to check the object has all the correct properties and data
+          comments.forEach((comment) => {
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+              article_id: expect.any(Number),
+            });
+          });
+          // testing that the comments array is sorted with jest-sorted
+          expect(comments).toBeSorted({ key: 'created_at' });
+        });
+    });
+    it('should respond with a status 400 and a bad request error message', () => {
+      return request(app)
+        .get('/api/articles/banana/comments')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request');
+        });
+    });
+    it('should respond with a status 200 but contain no comments in the array', () => {
+      return request(app)
+        .get('/api/articles/2/comments')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({ comments: [] });
+        });
+    });
+    it('should respond with a status 404 Sorry, no article found', () => {
+      return request(app)
+        .get('/api/articles/10000/comments')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Sorry, no article found');
+        });
+    });
+  });
 });
