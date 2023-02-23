@@ -7,6 +7,7 @@ const {
   articleExists,
   insertIntoComments,
   usernameExists,
+  updateArticleVoteCount,
 } = require('../models/articles-model');
 
 // controller functions
@@ -72,9 +73,31 @@ const postComment = (req, res, next) => {
       next(err);
     });
 };
+
+const updateArticleVotes = (req, res, next) => {
+  const { article_id } = req.params;
+  const { inc_votes } = req.body;
+  // updates the selected article votes property with the passed votes value
+
+  const articleExistsPromise = articleExists(article_id);
+  const updateArticleVoteCountPromise = updateArticleVoteCount(
+    article_id,
+    inc_votes
+  );
+  Promise.all([updateArticleVoteCountPromise, articleExistsPromise])
+    .then((values) => {
+      const updatedArticle = values[0];
+      res.status(200).send({ updatedArticle });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 module.exports = {
   sendArticles,
   sendIndividualArticle,
   sendArticleComments,
   postComment,
+  updateArticleVotes,
 };
