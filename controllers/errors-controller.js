@@ -6,6 +6,9 @@ const handleCustomErrors = (err, req, res, next) => {
   if (err === 'Sorry, no article found') {
     res.status(404).send({ msg: err });
   }
+  if (err === 'Invalid username') {
+    res.status(404).send({ msg: err });
+  }
   //passed the err to the next middleware
   next(err);
 };
