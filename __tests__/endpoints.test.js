@@ -170,4 +170,50 @@ describe('app endpoint tests', () => {
         });
     });
   });
+  describe('POST /api/articles/:article_id/comments', () => {
+    it('should respond with a status 201 and the posted comment', () => {
+      return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'butter_bridge', body: 'Posting a new comment' })
+        .expect(201)
+        .then(({ body }) => {
+          expect(body.comment[0]).toEqual({
+            article_id: 2,
+            author: 'butter_bridge',
+            body: 'Posting a new comment',
+            comment_id: 19,
+            created_at: expect.any(String),
+            votes: 0,
+          });
+          // test to see if it updated in database
+          return request(app)
+            .get('/api/articles/2/comments')
+            .expect(200)
+            .then(({ body }) => {
+              // before post request the length was 0
+              expect(body.comments.length).toBe(1);
+            });
+        });
+    });
+    //test incorrect datatype in request body
+    it('should respond with a status 400 Bad request ', () => {
+      return request(app)
+        .post('/api/articles/banana/comments')
+        .send({ username: 'butter_bridge', body: 'Posting a new comment' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request');
+        });
+    });
+    //test malformed request missing notnull values
+    it('should respond with a status 400 Malformed request', () => {
+      return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'butter_bridge' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Malformed request');
+        });
+    });
+  });
 });
