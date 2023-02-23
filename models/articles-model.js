@@ -72,10 +72,22 @@ const insertIntoComments = (article_id, body, username) => {
     });
 };
 
+const usernameExists = (username) => {
+  console.log(username);
+  return db
+    .query(`SELECT * FROM users WHERE users.username = $1`, [username])
+    .then((data) => {
+      if (data.rows.length === 0) {
+        return Promise.reject('Invalid username');
+      }
+    });
+};
+
 module.exports = {
   selectArticles,
   selectIndividualArticle,
   selectArticleComments,
   articleExists,
   insertIntoComments,
+  usernameExists,
 };
