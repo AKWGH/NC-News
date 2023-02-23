@@ -6,6 +6,7 @@ const {
   selectArticleComments,
   articleExists,
   insertIntoComments,
+  usernameExists,
 } = require('../models/articles-model');
 
 // controller functions
@@ -50,8 +51,21 @@ const postComment = (req, res, next) => {
   const { article_id } = req.params;
   const { username, body } = req.body;
 
-  insertIntoComments(article_id, body, username)
-    .then((comment) => {
+  const usernameExistsPromise = usernameExists(username);
+  const articleExistsPromise = articleExists(article_id);
+  const insertIntoCommentsPromise = insertIntoComments(
+    article_id,
+    body,
+    username
+  );
+
+  Promise.all([
+    insertIntoCommentsPromise,
+    usernameExistsPromise,
+    articleExistsPromise,
+  ])
+    .then((values) => {
+      const comment = values[0];
       res.status(201).send({ comment });
     })
     .catch((err) => {
