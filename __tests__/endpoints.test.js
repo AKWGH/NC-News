@@ -215,5 +215,23 @@ describe('app endpoint tests', () => {
           expect(body.msg).toBe('Malformed request');
         });
     });
+    it('should respond with a 404 not found Invalid username as the username andy does not exist in the database', () => {
+      return request(app)
+        .post('/api/articles/2/comments')
+        .send({ username: 'andy', body: 'Hello world' })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid username');
+        });
+    });
+    it('should respond with a 404 no article found', () => {
+      return request(app)
+        .post('/api/articles/1000/comments')
+        .send({ username: 'butter_bridge', body: 'Posting a new comment' })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Sorry, no article found');
+        });
+    });
   });
 });
