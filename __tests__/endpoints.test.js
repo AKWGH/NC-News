@@ -234,4 +234,60 @@ describe('app endpoint tests', () => {
         });
     });
   });
+  describe('PATCH /api/articles/:article_id', () => {
+    it('should respond with 200 and update the articles votes', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 1 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.updatedArticle[0].votes).toBe(101);
+        });
+    });
+    it('should respond with 200 and be able to decrement the votes count', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: -25 })
+        .expect(200)
+        .then(({ body }) => {
+          expect(body.updatedArticle[0].votes).toBe(75);
+        });
+    });
+    it('should respond with a status 400 malformed request when not sent the correct data in the body', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ wrongData: 'hello' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Malformed request');
+        });
+    });
+    it('should respond with a status 400 Bad request when the path is bad', () => {
+      return request(app)
+        .patch('/api/articles/banana')
+        .send({ inc_votes: 1 })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request');
+        });
+    });
+    it('should respond with a 404 Sorry, no article found when the article does not exist', () => {
+      return request(app)
+        .patch('/api/articles/10000')
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Sorry, no article found');
+        });
+    });
+    it('should respond with a 400 Bad request when incorrect datatype in request body', () => {
+      return request(app)
+        .patch('/api/articles/1')
+        .send({ inc_votes: 'banana' })
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request');
+        });
+    });
+  });
 });
