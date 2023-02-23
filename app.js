@@ -6,6 +6,7 @@ const {
   sendArticles,
   sendIndividualArticle,
   sendArticleComments,
+  postComment,
 } = require('./controllers/articles-controller');
 const {
   invalidPathError,
@@ -16,6 +17,8 @@ const {
 // initialises express server
 const app = express();
 
+app.use(express.json());
+
 // requests
 app.get('/api/topics', sendTopics);
 
@@ -24,6 +27,8 @@ app.get('/api/articles', sendArticles);
 app.get('/api/articles/:article_id', sendIndividualArticle);
 
 app.get('/api/articles/:article_id/comments', sendArticleComments);
+
+app.post('/api/articles/:article_id/comments', postComment);
 
 // handles invalid path
 app.use(invalidPathError);
