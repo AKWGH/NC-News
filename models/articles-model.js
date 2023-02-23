@@ -59,9 +59,35 @@ const articleExists = (article_id) => {
     });
 };
 
+const insertIntoComments = (article_id, body, username) => {
+  // inserts into comments TABLE
+  return db
+    .query(
+      `INSERT INTO comments (body,author,article_id)
+    VALUES ($1,$2,$3) RETURNING *;`,
+      [body, username, article_id]
+    )
+    .then((data) => {
+      return data.rows;
+    });
+};
+
+const usernameExists = (username) => {
+  console.log(username);
+  return db
+    .query(`SELECT * FROM users WHERE users.username = $1`, [username])
+    .then((data) => {
+      if (data.rows.length === 0) {
+        return Promise.reject('Invalid username');
+      }
+    });
+};
+
 module.exports = {
   selectArticles,
   selectIndividualArticle,
   selectArticleComments,
   articleExists,
+  insertIntoComments,
+  usernameExists,
 };

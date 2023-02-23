@@ -6,6 +6,9 @@ const handleCustomErrors = (err, req, res, next) => {
   if (err === 'Sorry, no article found') {
     res.status(404).send({ msg: err });
   }
+  if (err === 'Invalid username') {
+    res.status(404).send({ msg: err });
+  }
   //passed the err to the next middleware
   next(err);
 };
@@ -13,6 +16,9 @@ const handleCustomErrors = (err, req, res, next) => {
 const handlePSQLErrors = (err, req, res, next) => {
   if (err.code === '22P02') {
     res.status(400).send({ msg: 'Bad request' });
+  }
+  if (err.code === '23502') {
+    res.status(400).send({ msg: 'Malformed request' });
   }
 };
 

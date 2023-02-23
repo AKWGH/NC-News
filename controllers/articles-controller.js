@@ -5,6 +5,8 @@ const {
   selectIndividualArticle,
   selectArticleComments,
   articleExists,
+  insertIntoComments,
+  usernameExists,
 } = require('../models/articles-model');
 
 // controller functions
@@ -45,4 +47,34 @@ const sendArticleComments = (req, res, next) => {
     });
 };
 
-module.exports = { sendArticles, sendIndividualArticle, sendArticleComments };
+const postComment = (req, res, next) => {
+  const { article_id } = req.params;
+  const { username, body } = req.body;
+
+  const usernameExistsPromise = usernameExists(username);
+  const articleExistsPromise = articleExists(article_id);
+  const insertIntoCommentsPromise = insertIntoComments(
+    article_id,
+    body,
+    username
+  );
+
+  Promise.all([
+    insertIntoCommentsPromise,
+    usernameExistsPromise,
+    articleExistsPromise,
+  ])
+    .then((values) => {
+      const comment = values[0];
+      res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+module.exports = {
+  sendArticles,
+  sendIndividualArticle,
+  sendArticleComments,
+  postComment,
+};
