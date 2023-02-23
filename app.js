@@ -2,6 +2,7 @@
 const express = require('express');
 //controllers
 const { sendTopics } = require('./controllers/topics-controller');
+// articles controller
 const {
   sendArticles,
   sendIndividualArticle,
@@ -9,6 +10,9 @@ const {
   postComment,
   updateArticleVotes,
 } = require('./controllers/articles-controller');
+// users controller
+const { sendUsers } = require('./controllers/users-controller');
+
 const {
   invalidPathError,
   handleCustomErrors,
@@ -32,6 +36,8 @@ app.get('/api/articles/:article_id/comments', sendArticleComments);
 app.post('/api/articles/:article_id/comments', postComment);
 
 app.patch('/api/articles/:article_id', updateArticleVotes);
+
+app.get('/api/users', sendUsers);
 
 // handles invalid path
 app.use(invalidPathError);
