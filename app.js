@@ -7,6 +7,7 @@ const {
   sendIndividualArticle,
   sendArticleComments,
   postComment,
+  updateArticleVotes,
 } = require('./controllers/articles-controller');
 const {
   invalidPathError,
@@ -29,6 +30,8 @@ app.get('/api/articles/:article_id', sendIndividualArticle);
 app.get('/api/articles/:article_id/comments', sendArticleComments);
 
 app.post('/api/articles/:article_id/comments', postComment);
+
+app.patch('/api/articles/:article_id', updateArticleVotes);
 
 // handles invalid path
 app.use(invalidPathError);
