@@ -1,3 +1,4 @@
+const { query } = require('../db/connection');
 const db = require('../db/connection');
 
 const selectArticles = (topic, sort_by = 'created_at', order = 'desc') => {
@@ -18,21 +19,23 @@ const selectArticles = (topic, sort_by = 'created_at', order = 'desc') => {
   if (!orderOptions.includes(order)) {
     return Promise.reject('Invalid order query');
   }
+  // have to seperate the query string to dynamically make different requests depending on topic value
   let queryStr = `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-    FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+    FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id
+    `;
+  // empty array to contain the value of topic if it exists
+  const queryValue = [];
+  // if topic is truthy adds to the query string and pushes to the array
+  if (topic) {
+    queryStr += ` WHERE articles.topic LIKE $1 `;
+    queryValue.push(`%${topic}%`);
+  }
 
-  return db.query(queryStr).then((data) => {
-    // checks to see if we are filtering data by topic
-    let filter = data.rows;
-    if (topic) {
-      filter = filter.filter((article) => {
-        return article.topic.includes(topic);
-      });
-    }
+  queryStr += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
+  return db.query(queryStr, queryValue).then((data) => {
     // map over data changing the string value to a number
-    const correctArticleData = filter.map((article) => {
+    const correctArticleData = data.rows.map((article) => {
       // copy of data
       const articleCopy = { ...article };
       // change the key of comment_count to a number
@@ -123,8 +126,3 @@ module.exports = {
   usernameExists,
   updateArticleVoteCount,
 };
-
-// `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
-//     FROM articles
-//     LEFT JOIN comments ON articles.article_id = comments.article_id
-//     GROUP BY articles.article_id ORDER BY created_at;`
