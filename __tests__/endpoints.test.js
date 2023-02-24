@@ -325,63 +325,84 @@ describe('app endpoint tests', () => {
           });
         });
     });
-  });
-  it('should respond with 200 and and have the data sorted by author and ascending order', () => {
-    return request(app)
-      .get('/api/articles/?sort_by=author&order=asc')
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles).toBeSorted({
-          key: 'author',
-          descending: false,
+    it('should respond with 200 and and have the data sorted by author and ascending order', () => {
+      return request(app)
+        .get('/api/articles/?sort_by=author&order=asc')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles).toBeSorted({
+            key: 'author',
+            descending: false,
+          });
         });
-      });
-  });
-  it('should respind with 200 and have the data filtered by topic', () => {
-    return request(app)
-      .get('/api/articles/?topic=cats')
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles.length).toBe(1);
-      });
-  });
-  it('should respond with 200 and have the data filtered by topic sorted by author in asc order', () => {
-    return request(app)
-      .get('/api/articles/?sort_by=author&topic=mitch&order=asc')
-      .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
-        expect(articles.length).toBe(11);
-        expect(articles).toBeSorted({
-          key: 'author',
-          descending: false,
+    });
+    it('should respind with 200 and have the data filtered by topic', () => {
+      return request(app)
+        .get('/api/articles/?topic=cats')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(1);
         });
-      });
+    });
+    it('should respond with 200 and have the data filtered by topic sorted by author in asc order', () => {
+      return request(app)
+        .get('/api/articles/?sort_by=author&topic=mitch&order=asc')
+        .expect(200)
+        .then(({ body }) => {
+          const { articles } = body;
+          expect(articles.length).toBe(11);
+          expect(articles).toBeSorted({
+            key: 'author',
+            descending: false,
+          });
+        });
+    });
+    it('should respond with 200 but show an empty array as the topic filter has no matches but still a valid search query', () => {
+      return request(app)
+        .get('/api/articles/?topic=banana')
+        .expect(200)
+        .then(({ body }) => {
+          expect(body).toEqual({ articles: [] });
+        });
+    });
+    it('should respond with a 400 Invalid sort query', () => {
+      return request(app)
+        .get('/api/articles/?sort_by=gkjehe')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid sort query');
+        });
+    });
+    it('should respond with a 400 Invalid order query', () => {
+      return request(app)
+        .get('/api/articles/?order=gkjehe')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Invalid order query');
+        });
+    });
   });
-  it('should respond with 200 but show an empty array as the topic filter has no matches but still a valid search query', () => {
-    return request(app)
-      .get('/api/articles/?topic=banana')
-      .expect(200)
-      .then(({ body }) => {
-        expect(body).toEqual({ articles: [] });
-      });
-  });
-  it('should respond with a 400 Invalid sort query', () => {
-    return request(app)
-      .get('/api/articles/?sort_by=gkjehe')
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Invalid sort query');
-      });
-  });
-  it('should respond with a 400 Invalid order query', () => {
-    return request(app)
-      .get('/api/articles/?order=gkjehe')
-      .expect(400)
-      .then(({ body }) => {
-        expect(body.msg).toBe('Invalid order query');
-      });
+  describe('GET /api/articles/:article_id', () => {
+    it('should respond with 200 and have the new comment_count value in the response object', () => {
+      return request(app)
+        .get('/api/articles/1')
+        .expect(200)
+        .then(({ body }) => {
+          const { article } = body;
+          expect(article[0]).toMatchObject({
+            article_id: 1,
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+            comment_count: expect.any(Number),
+          });
+        });
+    });
   });
 });
