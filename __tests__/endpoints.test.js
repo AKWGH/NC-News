@@ -384,7 +384,7 @@ describe('app endpoint tests', () => {
         });
     });
   });
-  describe('GET /api/articles/:article_id', () => {
+  describe('GET /api/articles/:article_id refactor', () => {
     it('should respond with 200 and have the new comment_count value in the response object', () => {
       return request(app)
         .get('/api/articles/1')
