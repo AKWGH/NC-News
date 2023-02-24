@@ -13,13 +13,11 @@ const {
 // controller functions
 const sendArticles = (req, res, next) => {
   const { topic, sort_by, order } = req.query;
-  console.log(topic, sort_by, order);
   selectArticles(topic, sort_by, order)
     .then((articles) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {
-      console.log(err);
       next(err);
     });
 };

@@ -48,16 +48,29 @@ const selectArticles = (topic, sort_by = 'created_at', order = 'desc') => {
 
 const selectIndividualArticle = (article_id) => {
   // selects the individual article data
-  return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [article_id])
-    .then((data) => {
-      // rejects promise as no article data exists
-      if (data.rows.length === 0) {
-        return Promise.reject('Sorry, no article found');
-      }
-      // article data exists so it sends a response
-      return data.rows;
-    });
+  return (
+    db
+      // `SELECT * FROM articles WHERE article_id = $1`
+      .query(
+        `SELECT articles.* ,COUNT(comments.comment_id) AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id `,
+        [article_id]
+      )
+      .then((data) => {
+        // rejects promise as no article data exists
+        if (data.rows.length === 0) {
+          return Promise.reject('Sorry, no article found');
+        }
+        // article data exists so it sends a response
+        // changes comment_count value to a number from string
+        const correctArticleData = data.rows.map((article) => {
+          const copyArticle = { ...article };
+          copyArticle.comment_count = +copyArticle.comment_count;
+          return copyArticle;
+        });
+
+        return correctArticleData;
+      })
+  );
 };
 
 const selectArticleComments = (article_id) => {
