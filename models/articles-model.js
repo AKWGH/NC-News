@@ -1,25 +1,46 @@
 const db = require('../db/connection');
 
-const selectArticles = () => {
-  // selects the data from the articles Table
-  return db
-    .query(
-      `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+const selectArticles = (topic, sort_by = 'created_at', order = 'desc') => {
+  // potential options to check its valid
+  const sortByOptions = [
+    'title',
+    'topic',
+    'author',
+    'body',
+    'votes',
+    'created_at',
+  ];
+  const orderOptions = ['asc', 'desc'];
+  // checks to see if sort and order querys are valid otherwise throws an error
+  if (!sortByOptions.includes(sort_by)) {
+    return Promise.reject('Invalid sort query');
+  }
+  if (!orderOptions.includes(order)) {
+    return Promise.reject('Invalid order query');
+  }
+  let queryStr = `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
     FROM articles
-    LEFT JOIN comments ON articles.article_id = comments.article_id
-    GROUP BY articles.article_id ORDER BY created_at;`
-    )
-    .then((data) => {
-      // map over data changing the string value to a number
-      const correctArticleData = data.rows.map((article) => {
-        // copy of data
-        const articleCopy = { ...article };
-        // change the key of comment_count to a number
-        articleCopy.comment_count = +articleCopy.comment_count;
-        return articleCopy;
+    LEFT JOIN comments ON articles.article_id = comments.article_id GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
+
+  return db.query(queryStr).then((data) => {
+    // checks to see if we are filtering data by topic
+    let filter = data.rows;
+    if (topic) {
+      filter = filter.filter((article) => {
+        return article.topic.includes(topic);
       });
-      return correctArticleData;
+    }
+
+    // map over data changing the string value to a number
+    const correctArticleData = filter.map((article) => {
+      // copy of data
+      const articleCopy = { ...article };
+      // change the key of comment_count to a number
+      articleCopy.comment_count = +articleCopy.comment_count;
+      return articleCopy;
     });
+    return correctArticleData;
+  });
 };
 
 const selectIndividualArticle = (article_id) => {
@@ -102,3 +123,8 @@ module.exports = {
   usernameExists,
   updateArticleVoteCount,
 };
+
+// `SELECT articles.*, COUNT(comments.comment_id) AS comment_count
+//     FROM articles
+//     LEFT JOIN comments ON articles.article_id = comments.article_id
+//     GROUP BY articles.article_id ORDER BY created_at;`
