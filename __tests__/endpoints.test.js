@@ -405,4 +405,25 @@ describe('app endpoint tests', () => {
         });
     });
   });
+  describe('DELETE /api/comments/:comment_id', () => {
+    it('should respond with a 204 and delete the comment from the database', () => {
+      return request(app).delete('/api/comments/2').expect(204);
+    });
+    it('should respond with 404 when comment does not exist in the database', () => {
+      return request(app)
+        .delete('/api/comments/2000')
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe('comment not found');
+        });
+    });
+    it('should respond with a 400 bad request', () => {
+      return request(app)
+        .delete('/api/comments/banana')
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe('Bad request');
+        });
+    });
+  });
 });
