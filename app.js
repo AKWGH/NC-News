@@ -55,9 +55,4 @@ app.use(handleCustomErrors);
 // handles psql errors
 app.use(handlePSQLErrors);
 
-// app listener listening for requests
-// app.listen(9090, () => {
-//   console.log('listening on 9090');
-// });
-
 module.exports = app;
