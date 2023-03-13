@@ -1,6 +1,8 @@
 // require express package
 const express = require('express');
 
+const cors = require('cors');
+
 //controllers
 const { sendTopics } = require('./controllers/topics-controller');
 
@@ -28,6 +30,8 @@ const {
 
 // initialises express server
 const app = express();
+
+app.use(cors());
 
 app.use(express.json());
 
