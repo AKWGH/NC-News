@@ -145,7 +145,7 @@ describe('app endpoint tests', () => {
             });
           });
           // testing that the comments array is sorted with jest-sorted
-          expect(comments).toBeSorted({ key: 'created_at' });
+          expect(comments).toBeSorted({ key: 'created_at', descending: true });
         });
     });
     it('should respond with a status 400 and a bad request error message', () => {
