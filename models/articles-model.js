@@ -72,9 +72,10 @@ const selectIndividualArticle = (article_id) => {
 const selectArticleComments = (article_id) => {
   // selects the comments data for specified article
   return db
-    .query(`SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at`, [
-      article_id,
-    ])
+    .query(
+      `SELECT * FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
+      [article_id]
+    )
     .then((data) => {
       return data.rows;
     });
